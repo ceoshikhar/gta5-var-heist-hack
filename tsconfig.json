@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist/",
+        "strict": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "target": "esnext",
+        "sourceMap": true
+    },
+    "include": ["./src/**/*"]
+}

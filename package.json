@@ -1,0 +1,30 @@
+{
+    "name": "gta5-var-heist-hack",
+    "version": "1.0.0",
+    "description": "GTA5 VAR Heist Hack",
+    "license": "MIT",
+    "private": true,
+    "scripts": {
+        "clean": "rm dist/bundle.js",
+        "start": "webpack serve --open --mode development",
+        "build": "webpack --mode production",
+        "test": "jest"
+    },
+    "author": {
+        "name": "Shikhar Sharma",
+        "email": "ceoshikhar@gmail.com",
+        "url": "https://ceoshikhar.com"
+    },
+    "devDependencies": {
+        "@babel/preset-env": "^7.16.4",
+        "@babel/preset-typescript": "^7.16.0",
+        "@types/jest": "^27.0.3",
+        "html-webpack-plugin": "^5.5.0",
+        "jest": "^27.4.4",
+        "ts-loader": "^9.2.6",
+        "typescript": "^4.5.3",
+        "webpack": "^5.65.0",
+        "webpack-cli": "^4.9.1",
+        "webpack-dev-server": "^4.6.0"
+    }
+}
