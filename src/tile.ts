@@ -5,11 +5,16 @@ import { addEntity, getEntity, setEntity } from './entity';
 
 import { Id } from './types';
 import { Record } from 'immutable';
+import { app } from './index';
 
 type TileOptions = {
     value: number;
     selected: boolean;
     shape: PIXI.Rectangle;
+    velocity: {
+        x: number;
+        y: number;
+    };
 };
 
 type Tile = Record<TileOptions>;
@@ -28,7 +33,12 @@ const createTile = (
     const shape = new PIXI.Rectangle(x, y, size, size);
 
     const selected = false;
-    const tile: Tile = Record({ value, selected, shape })();
+    const tile: Tile = Record({
+        value,
+        selected,
+        shape,
+        velocity: { x: 1, y: 1 },
+    })();
     return tile;
 };
 
@@ -49,15 +59,13 @@ export const createTiles = (
     return ids;
 };
 
-export const renderTiles = (
-    ids: Id[],
-    app: PIXI.Application
-): PIXI.Graphics => {
+export const renderTiles = (ids: Id[]): PIXI.Graphics => {
     const tileGraphics = new PIXI.Graphics();
 
     for (const id of ids) {
         const tile = getEntity<Tile>(id);
         const shape = tile.get('shape');
+        const velocity = tile.get('velocity');
 
         if (tile.get('selected')) {
             tileGraphics.beginFill(TILE_SELECTED_BG_COLOR);
@@ -67,6 +75,28 @@ export const renderTiles = (
 
         tileGraphics.drawRect(shape.x, shape.y, shape.width, shape.height);
         tileGraphics.endFill();
+
+        shape.x = shape.x + velocity.x;
+        shape.y = shape.y + velocity.y;
+
+        const newTile = tile.set('shape', shape);
+        setEntity(id, newTile);
+
+        if (shape.bottom > app.screen.bottom || shape.top < app.screen.top) {
+            const newTile = tile.set('velocity', {
+                ...velocity,
+                y: -velocity.y,
+            });
+            setEntity(id, newTile);
+        }
+
+        if (shape.right > app.screen.right || shape.left < app.screen.left) {
+            const newTile = tile.set('velocity', {
+                ...velocity,
+                x: -velocity.x,
+            });
+            setEntity(id, newTile);
+        }
     }
 
     tileGraphics.interactive = true;
@@ -84,8 +114,6 @@ export const renderTiles = (
             }
         }
     });
-
-    app.stage.addChild(tileGraphics);
 
     return tileGraphics;
 };
