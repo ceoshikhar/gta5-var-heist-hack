@@ -1,23 +1,47 @@
 import * as PIXI from 'pixi.js';
 
+import { Id, Velocity } from './types';
 import { TILE_BG_COLOR, TILE_SELECTED_BG_COLOR } from './constants';
 import { addEntity, getEntity, setEntity } from './entity';
 
-import { Id } from './types';
 import { Record } from 'immutable';
 import { app } from './index';
+import { random } from './utils';
 
 type TileOptions = {
     value: number;
     selected: boolean;
     shape: PIXI.Rectangle;
-    velocity: {
-        x: number;
-        y: number;
-    };
+    velocity: Velocity;
 };
 
 type Tile = Record<TileOptions>;
+
+const giveRandomDirection = (speed: number): number => {
+    if (random() > 0.5) {
+        return speed;
+    } else {
+        return -speed;
+    }
+};
+
+const randomVelocity = (maxV: number): Velocity => {
+    const max = random(maxV, 3);
+    const min = 1;
+
+    return {
+        x: giveRandomDirection(random(max, min)),
+        y: giveRandomDirection(random(max, min)),
+    };
+};
+
+const shouldChangeVelocity = (): boolean => {
+    if (random() > 0.993) {
+        return true;
+    } else {
+        return false;
+    }
+};
 
 const createTile = (
     value: number,
@@ -31,13 +55,14 @@ const createTile = (
     const x = Math.random() * maxW;
     const y = Math.random() * maxH;
     const shape = new PIXI.Rectangle(x, y, size, size);
+    const velocity = randomVelocity(7);
 
     const selected = false;
     const tile: Tile = Record({
         value,
         selected,
         shape,
-        velocity: { x: 1, y: 1 },
+        velocity,
     })();
     return tile;
 };
@@ -95,6 +120,12 @@ export const renderTiles = (ids: Id[]): PIXI.Graphics => {
                 ...velocity,
                 x: -velocity.x,
             });
+            setEntity(id, newTile);
+        }
+
+        if (shouldChangeVelocity()) {
+            console.log('CHanging velocity');
+            const newTile = tile.set('velocity', randomVelocity(7));
             setEntity(id, newTile);
         }
     }
