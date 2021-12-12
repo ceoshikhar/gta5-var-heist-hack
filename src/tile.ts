@@ -36,7 +36,7 @@ const randomVelocity = (maxV: number): Velocity => {
 };
 
 const shouldChangeVelocity = (): boolean => {
-    if (random() > 0.993) {
+    if (random() > 0.995) {
         return true;
     } else {
         return false;
@@ -84,12 +84,12 @@ export const createTiles = (
     return ids;
 };
 
-export const renderTiles = (ids: Id[]): PIXI.Graphics => {
-    const tileGraphics = new PIXI.Graphics();
-
+export const renderTiles = (ids: Id[]): void => {
     for (const id of ids) {
+        const tileGraphics = new PIXI.Graphics();
         const tile = getEntity<Tile>(id);
         const shape = tile.get('shape');
+        const value = tile.get('value');
         const velocity = tile.get('velocity');
 
         if (tile.get('selected')) {
@@ -100,6 +100,20 @@ export const renderTiles = (ids: Id[]): PIXI.Graphics => {
 
         tileGraphics.drawRect(shape.x, shape.y, shape.width, shape.height);
         tileGraphics.endFill();
+
+        const style = new PIXI.TextStyle({
+            fontFamily: 'Arial',
+            fontSize: 36,
+            fontWeight: 'bold',
+            fill: '#ffffff',
+        });
+
+        const valueText = new PIXI.Text(`${value}`, style);
+        valueText.x = shape.x + shape.width / 4;
+        valueText.y = shape.y + shape.height / 4;
+        tileGraphics.addChild(valueText);
+
+        app.stage.addChild(tileGraphics);
 
         shape.x = shape.x + velocity.x;
         shape.y = shape.y + velocity.y;
@@ -124,27 +138,26 @@ export const renderTiles = (ids: Id[]): PIXI.Graphics => {
         }
 
         if (shouldChangeVelocity()) {
-            console.log('CHanging velocity');
+            console.log('Changing velocity');
             const newTile = tile.set('velocity', randomVelocity(7));
             setEntity(id, newTile);
         }
-    }
 
-    tileGraphics.interactive = true;
+        tileGraphics.interactive = true;
+        tileGraphics.buttonMode = true;
+        tileGraphics.on('pointerdown', (e: PIXI.InteractionEvent) => {
+            console.log('CLICKED ON SHAPE:', { tile });
+            const { x, y } = e.data.global;
 
-    tileGraphics.on('pointerdown', (e: PIXI.InteractionEvent) => {
-        const { x, y } = e.data.global;
+            for (const id of ids) {
+                const tile = getEntity<Tile>(id);
+                const shape = tile.get('shape');
 
-        for (const id of ids) {
-            const tile = getEntity<Tile>(id);
-            const shape = tile.get('shape');
-
-            if (shape.contains(x, y)) {
-                const newTile = tile.set('selected', !tile.get('selected'));
-                setEntity(id, newTile);
+                if (shape.contains(x, y)) {
+                    const newTile = tile.set('selected', !tile.get('selected'));
+                    setEntity(id, newTile);
+                }
             }
-        }
-    });
-
-    return tileGraphics;
+        });
+    }
 };

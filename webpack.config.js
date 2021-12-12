@@ -7,8 +7,7 @@ const config = {
   devtool: "source-map",
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "bundle.js",
-    publicPath: path.resolve(__dirname, "assets")
+    filename: "bundle.js"
   },
   devServer: {
     static: './dist',
@@ -20,13 +19,9 @@ const config = {
         use: [
           {
             loader: "ts-loader"
-          },
+          }
         ],
       },
-      {
-       test: /\.png/,
-       type: 'asset/resource'
-     }
     ]
   },
   ignoreWarnings: [/failed to load source map/],

@@ -19,6 +19,7 @@
         "@babel/preset-env": "^7.16.4",
         "@babel/preset-typescript": "^7.16.0",
         "@types/jest": "^27.0.3",
+        "@types/stats.js": "^0.17.0",
         "html-webpack-plugin": "^5.5.0",
         "jest": "^27.4.4",
         "ts-loader": "^9.2.6",
@@ -30,6 +31,7 @@
     "dependencies": {
         "immutable": "^4.0.0",
         "nanoid": "^3.1.30",
-        "pixi.js": "^6.2.0"
+        "pixi.js": "^6.2.0",
+        "stats.js": "^0.17.0"
     }
 }

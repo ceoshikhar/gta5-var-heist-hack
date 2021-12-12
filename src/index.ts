@@ -3,6 +3,7 @@ import * as PIXI from 'pixi.js';
 import { createTiles, renderTiles } from './tile';
 
 import { BG_COLOR } from './constants';
+import Stats from 'stats.js';
 
 export const app = new PIXI.Application({
     width: 960,
@@ -13,12 +14,19 @@ export const app = new PIXI.Application({
 app.view.id = 'game-canvas';
 document.body.appendChild(app.view);
 
+const stats = new Stats();
+document.body.appendChild(stats.dom);
+
 const container = new PIXI.Container();
 app.stage.addChild(container);
 
 const tileIds = createTiles(6, app.view.width, app.view.height);
 
 app.ticker.add(() => {
+    stats.begin();
+
     app.stage.removeChildren();
-    app.stage.addChild(renderTiles(tileIds));
+    renderTiles(tileIds);
+
+    stats.end();
 });
