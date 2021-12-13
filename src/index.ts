@@ -33,14 +33,25 @@ const draw = () => {
 
     // Draw the tiles
     tiles.forEach((tile) => {
-        const pos = tile.get('position');
         if (tile.get('selected')) {
             ctx.fillStyle = TILE_SELECTED_BG_COLOR;
         } else {
             ctx.fillStyle = TILE_BG_COLOR;
         }
 
+        const pos = tile.get('position');
+        const valueText = String(tile.get('value'));
         ctx.fillRect(pos.x, pos.y, TILE_WIDTH, TILE_HEIGHT);
+
+        ctx.font = '32px Roboto';
+        ctx.fillStyle = '#fff';
+
+        const w = ctx.measureText(valueText).width;
+        ctx.fillText(
+            String(tile.get('value')),
+            pos.x + w * 1.5,
+            pos.y + w * 2.5
+        );
     });
 };
 
