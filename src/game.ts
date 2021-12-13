@@ -1,6 +1,4 @@
-import { Id } from './types';
 import { Record } from 'immutable';
-import { getEntity } from './entity';
 
 enum GameStatus {
     INIT = 'INIT',

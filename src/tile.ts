@@ -1,21 +1,23 @@
-import * as PIXI from 'pixi.js';
+import { List, Record } from 'immutable';
+import { Position, Velocity } from './types';
+import { TILE_HEIGHT, TILE_WIDTH } from './constants';
 
-import { Id, Velocity } from './types';
-import { TILE_BG_COLOR, TILE_SELECTED_BG_COLOR } from './constants';
-import { addEntity, getEntity, setEntity } from './entity';
-
-import { Record } from 'immutable';
-import { app } from './index';
+import { State } from './state';
+import { canvas } from './index';
 import { random } from './utils';
 
-type TileOptions = {
-    value: number;
+type Tile = Record<{
+    position: Position;
     selected: boolean;
-    shape: PIXI.Rectangle;
+    value: number;
     velocity: Velocity;
-};
+}>;
 
-type Tile = Record<TileOptions>;
+export type TileState = List<Tile>;
+
+export const initTileState = (): TileState => {
+    return List();
+};
 
 const giveRandomDirection = (speed: number): number => {
     if (random() > 0.5) {
@@ -48,116 +50,68 @@ const createTile = (
     totalWidth: number,
     totalHeight: number
 ): Tile => {
-    const size = 75;
-    const maxW = totalWidth - size;
-    const maxH = totalHeight - size;
-
+    const maxW = totalWidth - TILE_WIDTH;
+    const maxH = totalHeight - TILE_HEIGHT;
     const x = Math.random() * maxW;
     const y = Math.random() * maxH;
-    const shape = new PIXI.Rectangle(x, y, size, size);
-    const velocity = randomVelocity(7);
 
-    const selected = false;
     const tile: Tile = Record({
         value,
-        selected,
-        shape,
-        velocity,
+        position: { x, y },
+        selected: false,
+        velocity: randomVelocity(7),
     })();
+
     return tile;
 };
 
-export const createTiles = (
-    howMany: number,
-    totalWidth: number,
-    totalHeight: number
-): Id[] => {
-    const ids: Id[] = [];
+export const createTiles =
+    (howMany: number) =>
+    (state: State): State => {
+        let tileState: TileState = state.get('tileState');
 
-    for (let i = 0; i < howMany; i++) {
-        const value = i + 1;
-        const tile = createTile(value, totalWidth, totalHeight);
-        const id = addEntity(tile);
-        ids.push(id);
-    }
+        for (let i = 0; i < howMany; i++) {
+            const value = i + 1;
+            const tile = createTile(value, canvas.width, canvas.height);
+            tileState = tileState.push(tile);
+        }
 
-    return ids;
-};
+        state = state.set('tileState', tileState);
+        return state;
+    };
 
-export const renderTiles = (ids: Id[]): void => {
-    for (const id of ids) {
-        const tileGraphics = new PIXI.Graphics();
-        const tile = getEntity<Tile>(id);
-        const shape = tile.get('shape');
-        const value = tile.get('value');
+export const updateTileState = (state: State): State => {
+    let tileState: TileState = state.get('tileState');
+
+    tileState.forEach((tile, idx) => {
+        const position = tile.get('position');
         const velocity = tile.get('velocity');
 
-        if (tile.get('selected')) {
-            tileGraphics.beginFill(TILE_SELECTED_BG_COLOR);
-        } else {
-            tileGraphics.beginFill(TILE_BG_COLOR);
-        }
-
-        tileGraphics.drawRect(shape.x, shape.y, shape.width, shape.height);
-        tileGraphics.endFill();
-
-        const style = new PIXI.TextStyle({
-            fontFamily: 'Arial',
-            fontSize: 36,
-            fontWeight: 'bold',
-            fill: '#ffffff',
-        });
-
-        const valueText = new PIXI.Text(`${value}`, style);
-        valueText.x = shape.x + shape.width / 4;
-        valueText.y = shape.y + shape.height / 4;
-        tileGraphics.addChild(valueText);
-
-        app.stage.addChild(tileGraphics);
-
-        shape.x = shape.x + velocity.x;
-        shape.y = shape.y + velocity.y;
-
-        const newTile = tile.set('shape', shape);
-        setEntity(id, newTile);
-
-        if (shape.bottom > app.screen.bottom || shape.top < app.screen.top) {
-            const newTile = tile.set('velocity', {
-                ...velocity,
-                y: -velocity.y,
-            });
-            setEntity(id, newTile);
-        }
-
-        if (shape.right > app.screen.right || shape.left < app.screen.left) {
-            const newTile = tile.set('velocity', {
-                ...velocity,
-                x: -velocity.x,
-            });
-            setEntity(id, newTile);
-        }
+        const tileBottom = position.y + TILE_WIDTH;
+        const tileTop = position.y;
+        const tileRight = position.x + TILE_HEIGHT;
+        const tileLeft = position.x;
 
         if (shouldChangeVelocity()) {
-            console.log('Changing velocity');
-            const newTile = tile.set('velocity', randomVelocity(7));
-            setEntity(id, newTile);
+            const rndVel = randomVelocity(7);
+            velocity.x = rndVel.x;
+            velocity.y = rndVel.y;
         }
 
-        tileGraphics.interactive = true;
-        tileGraphics.buttonMode = true;
-        tileGraphics.on('pointerdown', (e: PIXI.InteractionEvent) => {
-            console.log('CLICKED ON SHAPE:', { tile });
-            const { x, y } = e.data.global;
+        if (tileBottom > canvas.height || tileTop < 0) {
+            velocity.y = -velocity.y;
+        } else if (tileRight > canvas.width || tileLeft < 0) {
+            velocity.x = -velocity.x;
+        }
 
-            for (const id of ids) {
-                const tile = getEntity<Tile>(id);
-                const shape = tile.get('shape');
+        position.x += velocity.x;
+        position.y += velocity.y;
 
-                if (shape.contains(x, y)) {
-                    const newTile = tile.set('selected', !tile.get('selected'));
-                    setEntity(id, newTile);
-                }
-            }
-        });
-    }
+        tile = tile.set('position', position);
+        tile = tile.set('velocity', velocity);
+        tileState = tileState.set(idx, tile);
+    });
+
+    state = state.set('tileState', tileState);
+    return state;
 };

@@ -1,32 +1,63 @@
-import * as PIXI from 'pixi.js';
+import {
+    BG_COLOR,
+    TILE_BG_COLOR,
+    TILE_HEIGHT,
+    TILE_SELECTED_BG_COLOR,
+    TILE_WIDTH,
+} from './constants';
+import { initState, nextState, setState, state } from './state';
 
-import { createTiles, renderTiles } from './tile';
-
-import { BG_COLOR } from './constants';
 import Stats from 'stats.js';
+import { createTiles } from './tile';
 
-export const app = new PIXI.Application({
-    width: 960,
-    height: 540,
-    backgroundColor: BG_COLOR,
-});
+setState(initState());
 
-app.view.id = 'game-canvas';
-document.body.appendChild(app.view);
+export const canvas: HTMLCanvasElement = document.getElementById(
+    'game-canvas'
+) as HTMLCanvasElement;
+export const ctx: CanvasRenderingContext2D = canvas.getContext(
+    '2d'
+) as CanvasRenderingContext2D;
 
 const stats = new Stats();
 document.body.appendChild(stats.dom);
 
-const container = new PIXI.Container();
-app.stage.addChild(container);
+setState(createTiles(6)(state));
 
-const tileIds = createTiles(6, app.view.width, app.view.height);
+const draw = () => {
+    // Clear the canvas
+    ctx.fillStyle = BG_COLOR;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-app.ticker.add(() => {
+    const tiles = state.get('tileState');
+
+    // Draw the tiles
+    tiles.forEach((tile) => {
+        const pos = tile.get('position');
+        if (tile.get('selected')) {
+            ctx.fillStyle = TILE_SELECTED_BG_COLOR;
+        } else {
+            ctx.fillStyle = TILE_BG_COLOR;
+        }
+
+        ctx.fillRect(pos.x, pos.y, TILE_WIDTH, TILE_HEIGHT);
+    });
+};
+
+const step = (t1: number) => (t2: number) => {
     stats.begin();
 
-    app.stage.removeChildren();
-    renderTiles(tileIds);
+    if (t2 - t1 > 16.66) {
+        // TODO: UPDATE STATE
+        setState(nextState(state));
+        draw();
+        requestAnimationFrame(step(t2));
+    } else {
+        requestAnimationFrame(step(t1));
+    }
 
     stats.end();
-});
+};
+
+draw();
+requestAnimationFrame(step(0));

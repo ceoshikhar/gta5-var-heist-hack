@@ -31,7 +31,6 @@
     "dependencies": {
         "immutable": "^4.0.0",
         "nanoid": "^3.1.30",
-        "pixi.js": "^6.2.0",
         "stats.js": "^0.17.0"
     }
 }
