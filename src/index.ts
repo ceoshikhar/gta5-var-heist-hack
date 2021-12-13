@@ -46,11 +46,10 @@ const draw = () => {
         ctx.font = '32px Roboto';
         ctx.fillStyle = '#fff';
 
-        const w = ctx.measureText(valueText).width;
         ctx.fillText(
             String(tile.get('value')),
-            pos.x + w * 1.5,
-            pos.y + w * 2.5
+            pos.x + TILE_WIDTH / 2.6,
+            pos.y + TILE_HEIGHT / 1.6
         );
     });
 };
