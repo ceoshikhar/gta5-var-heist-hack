@@ -32,8 +32,8 @@ const randomVelocity = (maxV: number): Velocity => {
     const min = 1;
 
     return {
-        x: giveRandomDirection(random(max, min)),
-        y: giveRandomDirection(random(max, min)),
+        x: giveRandomDirection(Math.floor(random(max, min))),
+        y: giveRandomDirection(Math.floor(random(max, min))),
     };
 };
 
