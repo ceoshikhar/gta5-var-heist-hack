@@ -1,8 +1,8 @@
+import { CoordX, CoordY, Position, Velocity } from './types';
 import { List, Record } from 'immutable';
-import { Position, Velocity } from './types';
+import { State, setState, state } from './state';
 import { TILE_HEIGHT, TILE_WIDTH } from './constants';
 
-import { State } from './state';
 import { canvas } from './index';
 import { random } from './utils';
 
@@ -65,20 +65,17 @@ const createTile = (
     return tile;
 };
 
-export const createTiles =
-    (howMany: number) =>
-    (state: State): State => {
-        let tileState: TileState = state.get('tileState');
+export const spawnTiles = (howMany: number) => {
+    let tiles: TileState = List([]);
 
-        for (let i = 0; i < howMany; i++) {
-            const value = i + 1;
-            const tile = createTile(value, canvas.width, canvas.height);
-            tileState = tileState.push(tile);
-        }
+    for (let i = 0; i < howMany; i++) {
+        const value = i + 1;
+        const tile = createTile(value, canvas.width, canvas.height);
+        tiles = tiles.push(tile);
+    }
 
-        state = state.set('tileState', tileState);
-        return state;
-    };
+    setState(state.set('tileState', tiles));
+};
 
 export const updateTileState = (state: State): State => {
     let tileState: TileState = state.get('tileState');
@@ -114,4 +111,39 @@ export const updateTileState = (state: State): State => {
 
     state = state.set('tileState', tileState);
     return state;
+};
+
+const contains =
+    (tile: Tile) =>
+    (x: CoordX, y: CoordY): boolean => {
+        const pos = tile.get('position');
+        const minX = pos.x;
+        const maxX = pos.x + TILE_WIDTH;
+        const minY = pos.y;
+        const maxY = pos.y + TILE_HEIGHT;
+
+        if (x > minX && x < maxX && y > minY && y < maxY) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+export const registerTileTouchListeners = () => {
+    canvas.addEventListener('pointerdown', (event) => {
+        const x = event.offsetX;
+        const y = event.offsetY;
+
+        let tileState = state.get('tileState');
+
+        tileState = tileState.map((tile) => {
+            if (contains(tile)(x, y)) {
+                tile = tile.set('selected', !tile.get('selected'));
+            }
+
+            return tile;
+        });
+
+        setState(state.set('tileState', tileState));
+    });
 };

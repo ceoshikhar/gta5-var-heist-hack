@@ -6,9 +6,9 @@ import {
     TILE_WIDTH,
 } from './constants';
 import { initState, nextState, setState, state } from './state';
+import { registerTileTouchListeners, spawnTiles } from './tile';
 
 import Stats from 'stats.js';
-import { createTiles } from './tile';
 
 setState(initState());
 
@@ -22,7 +22,7 @@ export const ctx: CanvasRenderingContext2D = canvas.getContext(
 const stats = new Stats();
 document.body.appendChild(stats.dom);
 
-setState(createTiles(6)(state));
+spawnTiles(6);
 
 const draw = () => {
     // Clear the canvas
@@ -60,4 +60,5 @@ const step = (t1: number) => (t2: number) => {
 };
 
 draw();
+registerTileTouchListeners();
 requestAnimationFrame(step(0));
