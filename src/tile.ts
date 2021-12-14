@@ -101,10 +101,14 @@ export const updateTileState = (state: State): State => {
             velocity.y = rndVel.y;
         }
 
-        if (tileBottom > canvas.height || tileTop < 0) {
-            velocity.y = -velocity.y;
-        } else if (tileRight > canvas.width || tileLeft < 0) {
-            velocity.x = -velocity.x;
+        if (tileBottom > canvas.height) {
+            velocity.y = -Math.abs(velocity.y);
+        } else if (tileTop < 0) {
+            velocity.y = Math.abs(velocity.y);
+        } else if (tileRight > canvas.width) {
+            velocity.x = -Math.abs(velocity.x);
+        } else if (tileLeft < 0) {
+            velocity.x = Math.abs(velocity.x);
         }
 
         position.x += velocity.x;
