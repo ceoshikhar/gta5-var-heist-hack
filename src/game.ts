@@ -14,22 +14,63 @@ export type GameState = Record<{
     endGameAfter: MilliSecs;
     hideAfter: MilliSecs;
     lastTileClicked: Tile | null;
+    tileMaxSpeed: number;
     showValue: boolean;
     startTime: MilliSecs | null;
     status: GameStatus;
-    totalTiles: number;
+    tileCount: number;
 }>;
 
 export const initGameState = (): GameState => {
+    // TODO: Pass this data as argument and refactor this
+    // and have dom related code to someting like `dom.ts`.
+    // It definitely needs to go in a object for a controlled game.
+    const searchParams = new URLSearchParams(location.search);
+    const tileCount = Number(searchParams.get("tileCount")) || 6;
+    const endGameAfterInSecs = Number(searchParams.get("endGameAfter")) || 4;
+    const tileMaxSpeed = Number(searchParams.get("tileMaxSpeed")) || 5;
+    const hideAfterInSecs = Number(searchParams.get("hideAfter")) || 4;
+
     const game: GameState = Record({
-        endGameAfter: 5000,
-        hideAfter: 3000,
+        endGameAfter: endGameAfterInSecs * 1000,
+        hideAfter: hideAfterInSecs * 1000,
         lastTileClicked: null,
+        tileMaxSpeed,
         showValue: true,
         startTime: null,
         status: GameStatus.INIT,
-        totalTiles: 0,
+        tileCount,
     })();
+
+    const newSearchParams = new URLSearchParams({
+        tileCount: String(tileCount),
+        hideAfter: String(hideAfterInSecs),
+        tileMaxSpeed: String(tileMaxSpeed),
+        endGameAfter: String(endGameAfterInSecs),
+    }).toString();
+
+    const inputTileCount = document.getElementById(
+        "input-tile-count"
+    ) as HTMLInputElement;
+    const inputHideAfter = document.getElementById(
+        "input-hide-after"
+    ) as HTMLInputElement;
+    const inpuTileMaxSpeed = document.getElementById(
+        "input-tile-max-speed"
+    ) as HTMLInputElement;
+    const inputTileEndAfter = document.getElementById(
+        "input-end-game-after"
+    ) as HTMLInputElement;
+
+    inputTileCount.value = String(tileCount);
+    inputHideAfter.value = String(hideAfterInSecs);
+    inpuTileMaxSpeed.value = String(tileMaxSpeed);
+    inputTileEndAfter.value = String(endGameAfterInSecs);
+
+    const newRelativePathQuery =
+        location.pathname + "?" + newSearchParams.toString();
+    history.pushState(null, "", newRelativePathQuery);
+
     return game;
 };
 

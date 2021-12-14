@@ -1,4 +1,4 @@
-import { GameState, initGameState } from "./game";
+import { GameState, initGameState, isGameRunning } from "./game";
 import { TileState, initTileState, updateTileState } from "./tile";
 
 import { Record } from "immutable";
@@ -25,6 +25,10 @@ export const initState = (): State => {
 };
 
 export const nextState = (state: State): State => {
+    if (!isGameRunning(state)) {
+        return state;
+    }
+
     state = updateTileState(state);
     return state;
 };

@@ -28,8 +28,8 @@ const giveRandomDirection = (speed: number): number => {
     }
 };
 
-const randomVelocity = (maxV: number): Velocity => {
-    const max = random(maxV, 3);
+const randomVelocity = (): Velocity => {
+    const max = random(state.get("game").get("tileMaxSpeed"), 3);
     const min = 1;
 
     return {
@@ -60,24 +60,22 @@ const createTile = (
         value,
         position: { x, y },
         selected: false,
-        velocity: randomVelocity(7),
+        velocity: randomVelocity(),
     })();
 
     return tile;
 };
 
-export const spawnTiles = (howMany: number, state: State): State => {
+export const spawnTiles = (state: State): State => {
     let tileState = state.get("tile");
-    let gameState = state.get("game");
+    const tileCount = state.get("game").get("tileCount");
 
-    for (let i = 0; i < howMany; i++) {
+    for (let i = 0; i < tileCount; i++) {
         const value = i + 1;
         const tile = createTile(value, canvas.width, canvas.height);
         tileState = tileState.push(tile);
     }
 
-    gameState = gameState.set("totalTiles", howMany);
-    state = state.set("game", gameState);
     return state.set("tile", tileState);
 };
 
@@ -98,7 +96,7 @@ export const updateTileState = (state: State): State => {
         const tileLeft = position.x;
 
         if (shouldChangeVelocity()) {
-            const rndVel = randomVelocity(7);
+            const rndVel = randomVelocity();
             velocity.x = rndVel.x;
             velocity.y = rndVel.y;
         }
@@ -153,7 +151,7 @@ export const registerTileTouchListeners = () => {
 
         tileState.forEach((tile, idx) => {
             if (contains(tile)(x, y)) {
-                const totalTiles = gameState.get("totalTiles");
+                const totalTiles = gameState.get("tileCount");
                 const currTileValue = tile.get("value");
                 const lastTileValue = gameState
                     .get("lastTileClicked")
