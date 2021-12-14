@@ -13,7 +13,7 @@ export const ctx: CanvasRenderingContext2D = canvas.getContext(
 ) as CanvasRenderingContext2D;
 
 const stats = new Stats();
-document.body.appendChild(stats.dom);
+// document.body.appendChild(stats.dom);
 
 const step = (t1: number) => (t2: number) => {
     stats.begin();
