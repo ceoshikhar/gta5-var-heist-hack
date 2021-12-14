@@ -1,7 +1,7 @@
-import { GameState, initGameState } from './game';
-import { TileState, initTileState, updateTileState } from './tile';
+import { GameState, initGameState } from "./game";
+import { TileState, initTileState, updateTileState } from "./tile";
 
-import { Record } from 'immutable';
+import { Record } from "immutable";
 
 export type State = Record<{
     tile: TileState;
@@ -12,7 +12,7 @@ export let state: State;
 
 export const setState = (_state: State): void => {
     state = _state;
-    (globalThis as any).state = state;
+    globalThis.state = state;
 };
 
 export const initState = (): State => {

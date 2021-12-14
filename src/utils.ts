@@ -1,7 +1,7 @@
-import { MilliSecs } from './types';
-import { customAlphabet } from 'nanoid';
+import { MilliSecs } from "./types";
+import { customAlphabet } from "nanoid";
 
-const nanoid = customAlphabet('0123456789', 10);
+const nanoid = customAlphabet("0123456789", 10);
 
 export const generateId = (): string => {
     return nanoid();
