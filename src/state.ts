@@ -1,9 +1,11 @@
+import { GameState, initGameState } from './game';
 import { TileState, initTileState, updateTileState } from './tile';
 
 import { Record } from 'immutable';
 
 export type State = Record<{
-    tileState: TileState;
+    tile: TileState;
+    game: GameState;
 }>;
 
 export let state: State;
@@ -14,7 +16,10 @@ export const setState = (_state: State): void => {
 };
 
 export const initState = (): State => {
-    const state: State = Record({ tileState: initTileState() })();
+    const state: State = Record({
+        tile: initTileState(),
+        game: initGameState(),
+    })();
     return state;
 };
 

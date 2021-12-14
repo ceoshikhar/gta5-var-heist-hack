@@ -1,3 +1,4 @@
+import { MilliSecs } from './types';
 import { customAlphabet } from 'nanoid';
 
 const nanoid = customAlphabet('0123456789', 10);
@@ -9,3 +10,7 @@ export const generateId = (): string => {
 export const random = (max = 1, min = 0): number => {
     return Math.random() * (max - min) + min;
 };
+
+export function rightNow(): MilliSecs {
+    return Date.now();
+}

@@ -8,3 +8,4 @@ export type Coords = {
 };
 export type Position = Coords;
 export type Velocity = Coords;
+export type MilliSecs = number;
