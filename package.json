@@ -5,6 +5,7 @@
     "license": "MIT",
     "private": true,
     "scripts": {
+        "prebuild": "rm -rf dist",
         "build": "webpack --mode production",
         "clean": "rm dist/bundle.js",
         "format": "prettier --config .prettierrc.json './src/**/*.ts' --write",
