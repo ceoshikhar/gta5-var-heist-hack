@@ -12,7 +12,8 @@ export let state: State;
 
 export const setState = (_state: State): void => {
     state = _state;
-    globalThis.state = state;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).state = state;
 };
 
 export const initState = (): State => {
