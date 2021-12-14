@@ -1,7 +1,7 @@
 {
     "name": "gta5-var-heist-hack",
     "version": "1.0.0",
-    "description": "Practice GTA5 VAR Heist Hack",
+    "description": "GTA5 VAR Heist Hack Simulation Web Game",
     "license": "MIT",
     "private": true,
     "scripts": {
