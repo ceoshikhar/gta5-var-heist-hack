@@ -1,4 +1,4 @@
-import { endGame, hasGameEnded, startGame } from "./game";
+import { endGame, startGame } from "./game";
 import { initState, nextState, setState, state } from "./state";
 import { registerTileTouchListeners, spawnTiles } from "./tile";
 
